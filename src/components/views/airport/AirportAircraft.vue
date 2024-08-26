@@ -84,9 +84,10 @@
                 v-for="pilot in displayedAircraft"
                 :key="pilot.cid"
                 :bottom-items="[
-                    pilot.aircraft_faa ?? 'No flight plan',
-                    (pilot.distance && (aircraftMode !== 'ground' || !pilot.isArrival)) ? `${ Math.round(pilot.distance) }NM ${ aircraftMode !== 'ground' ? 'remains' : '' }` : '',
+                    '00:15H | 25NM remaining',
+                    // (pilot.distance && (aircraftMode !== 'ground' || !pilot.isArrival)) ? `${ aircraftMode !== 'ground' ? 'DTG ' : '' }${ Math.round(pilot.distance) }NM` : '',
                     (pilot.eta && aircraftMode !== 'ground') ? `ETA ${ datetime.format(pilot.eta) }Z` : '',
+                    // 'TTG 00:15H',
                 ]"
                 class="aircraft__pilot"
                 :class="{ 'aircraft__pilot--selected': simpleMode && selected === pilot.cid }"
@@ -131,7 +132,17 @@
                         ref="pilots"
                         class="aircraft__pilot_route"
                     >
-                        from <strong>{{ pilot.departure }}</strong> to <strong>{{ pilot.arrival }}</strong>
+                        <div>
+                            from <strong>{{ pilot.departure }}</strong> to <strong>{{ pilot.arrival }}</strong>
+                        </div>
+                        <div
+                            class="aircraft__pilot_route__separator"
+                        >
+                            <ellipse-icon/>
+                        </div>
+                        <div>
+                            {{ pilot.aircraft_faa ?? 'No flight plan' }}
+                        </div>
                     </div>
                 </template>
             </common-info-block>
@@ -156,6 +167,7 @@ import AirportAircraftFilter from '~/components/views/airport/AirportAircraftFil
 import CommonToggle from '~/components/common/basic/CommonToggle.vue';
 import type { MapAircraftKeys } from '~/types/map';
 import type { PropType } from 'vue';
+import EllipseIcon from 'assets/icons/basic/ellipse.svg?component';
 
 const props = defineProps({
     filterRelativeToAircraft: {
@@ -434,6 +446,16 @@ defineExpose({
 
         &_route {
             margin-top: 4px;
+
+            display: flex;
+            gap: 4px 8px;
+            align-items: center;
+
+            &__separator{
+                width: 4px;
+                min-width: 4px;
+                color: varToRgba('lightgray150', 0.5);
+            }
         }
 
         &_header {
