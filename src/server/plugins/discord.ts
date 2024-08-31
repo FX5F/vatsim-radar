@@ -34,6 +34,7 @@ function parseMarkdown() {
 }
 
 export default defineNitroPlugin(async app => {
+    return;
     app.hooks.hook('request', event => {
         event.context.radarVersion = json.version;
     });

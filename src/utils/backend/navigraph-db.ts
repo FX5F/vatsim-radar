@@ -68,6 +68,7 @@ async function downloadNavigraphFile({ fileUrl, path, filename }: { fileUrl: str
 
 export async function initNavigraph() {
     if (!accessKey.token || !accessKey.expires || accessKey.expires < Date.now()) {
+        return;
         const form = new URLSearchParams();
         form.set('client_id', process.env.NAVIGRAPH_SERVER_ID!);
         form.set('client_secret', process.env.NAVIGRAPH_SERVER_SECRET!);
@@ -86,6 +87,7 @@ export async function initNavigraph() {
         accessKey.token = access_token;
         accessKey.expires = Date.now() + (expires_in * 1000);
     }
+    return;
 
     const [current] = await $fetch<File[]>('https://api.navigraph.com/v1/navdata/packages?package_status=current', {
         headers: {

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev & node --import=tsx ./src/utils/backend/worker/data-worker.ts",
+    "worker": "node --import=tsx ./src/utils/backend/worker/data-worker.ts",
     "generate": "nuxt generate",
     "preview": "node .output/server/index.mjs",
     "postinstall": "nuxt prepare",

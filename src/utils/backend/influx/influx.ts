@@ -6,6 +6,7 @@ export let influxDBQuery: QueryApi;
 export let influxDBWrite: WriteApi;
 
 export function initInfluxDB() {
+    return;
     try {
         influxDB = new InfluxDB({
             url: process.env.INFLUX_URL!,
