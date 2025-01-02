@@ -30,6 +30,11 @@
             }"
             :z-index="20"
         >
+            <div v-for="(sector, index) in sectorsAtClick" :key="index">
+                    <div>Min: {{ sector.min }}</div>
+                    <div>Max: {{ sector.max }}</div>
+                    <div>Position: {{ sector.position }}</div>
+                </div>
             <common-controller-info
                 class="aircraft-hover"
                 :controllers="sectorsAtClick.map(x => x.atc).filter((x, xIndex) => !sectorsAtClick.some((y, yIndex) => xIndex > yIndex && x.cid === y.atc.cid))"

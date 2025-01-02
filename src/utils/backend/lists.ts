@@ -55,6 +55,7 @@ export type UserListLiveUser = UserListLiveUserPilot | UserListLiveUserPrefile |
 export type UserListLive = Omit<UserList, 'users'> & { users: UserListLiveUser[] };
 
 export async function handleListsEvent(event: H3Event) {
+    return;
     let userId: number | undefined;
 
     try {

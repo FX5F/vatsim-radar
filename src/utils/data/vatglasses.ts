@@ -109,6 +109,7 @@ function updateVatglassesPositionsAndAirspaces() {
             }
         }
 
+        const first = 0;
         // TODO: sort firs by the same as EuroScope sorts the positions before assigning logged in stations to a position
         const firs = dataStore?.vatsim?.data?.firs.value ?? workerDataStore?.vatsim?.firs;
         for (const fir of [...firs, ...arrivalController]) { // this has an entry for each center controller connected. const fir is basically a center controller
@@ -121,6 +122,27 @@ function updateVatglassesPositionsAndAirspaces() {
                 atc = fir.atc;
             }
             if (!atc) continue;
+
+
+            // // // used for debug
+            // if (first === 0) {
+            //     atc.frequency = '125.775';
+            //     atc.callsign = 'TOR_CTR';
+            //     atc.cid = 1025793;
+            //     first++;
+            // }
+            // else if (first === 1) {
+            //     break;
+            //     // if (calls > 3) break;
+            //     console.log('ALB');
+            //     atc.frequency = '129.100';
+            //     atc.callsign = 'EDMM_ALB_CTR';
+            //     atc.cid = 1025794;
+            //     first++;
+            // }
+            // else {
+            //     break;
+            // }
 
             let foundMatchingVatglassesController = false;
             let doublePositionMatch = false;
@@ -582,7 +604,7 @@ export const isVatGlassesActive = () => computed(() => {
 });
 
 let vatglassesUpdateInProgress = false;
-export async function updateVatglassesStateLocal() {
+export async function updateVatglassesStateLocal(forceNoCombine = false) {
     if (vatglassesUpdateInProgress) return;
     if (!isVatGlassesActive().value) return;
 
@@ -590,7 +612,7 @@ export async function updateVatglassesStateLocal() {
 
     vatglassesUpdateInProgress = true;
     const newVatglassesActivePositions = updateVatglassesPositionsAndAirspaces();
-    if (store.mapSettings.vatglasses?.active && store.mapSettings.vatglasses?.combined) {
+    if (store.mapSettings.vatglasses?.active && store.mapSettings.vatglasses?.combined && !forceNoCombine) {
         await combineAllVatglassesActiveSectors(newVatglassesActivePositions);
     }
     dataStore.vatglassesActivePositions.value = newVatglassesActivePositions;
@@ -623,13 +645,19 @@ let combineDataInitialized = false;
 async function initVatglassesCombined() {
     combineDataInitialized = true;
     try {
+        console.log('requestData');
         const data: VatglassesActiveData = JSON.parse(await $fetch<string>(`/api/data/vatsim/data/vatglasses-active`));
+        console.log('dataArrived');
         const vatglassesDataVersion = dataStore?.vatglasses?.value?.version;
+        console.log(vatglassesDataVersion);
+        console.log(data.version);
         if (vatglassesDataVersion === data.version) {
             for (const countryGroupId in data.vatglassesActivePositions) {
                 for (const positionId in data.vatglassesActivePositions[countryGroupId]) {
                     const serverPosition = data.vatglassesActivePositions[countryGroupId][positionId];
                     const localPosition = dataStore.vatglassesActivePositions.value[countryGroupId]?.[positionId];
+
+                    console.log('localPosition', localPosition);
 
                     if (localPosition) {
                         if (serverPosition.sectorsCombined) {
@@ -640,6 +668,8 @@ async function initVatglassesCombined() {
                                 }
                             }
                         }
+                        console.log('serverPosition.airspaceKeys ', serverPosition.airspaceKeys);
+                        console.log('localPosition.airspaceKeys ', localPosition.airspaceKeys);
                         if (serverPosition.airspaceKeys === localPosition.airspaceKeys) {
                             localPosition.sectorsCombined = serverPosition.sectorsCombined;
                             if (localPosition.lastUpdated) {
@@ -683,7 +713,7 @@ export async function initVatglasses(inputMode: string = 'local', serverDataStor
         const { default: combinedWorker } = await import('~/composables/combination-worker.ts?worker');
         worker = new combinedWorker();
 
-        updateVatglassesStateLocal();
+        await updateVatglassesStateLocal(true);
 
         const vatglassesCombined = computed(() => store.mapSettings.vatglasses?.combined && store.mapSettings.vatglasses?.active);
 

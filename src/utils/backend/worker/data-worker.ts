@@ -116,31 +116,31 @@ defineCronJob('20 */2 * * *', async () => {
     });
 });
 
-defineCronJob('*/15 * * * *', async () => {
-    await prisma.userToken.deleteMany({
-        where: {
-            refreshMaxDate: {
-                lte: new Date(),
-            },
-        },
-    });
+// defineCronJob('*/15 * * * *', async () => {
+//     await prisma.userToken.deleteMany({
+//         where: {
+//             refreshMaxDate: {
+//                 lte: new Date(),
+//             },
+//         },
+//     });
 
-    await prisma.auth.deleteMany({
-        where: {
-            createdAt: {
-                lte: new Date(Date.now() - (1000 * 60 * 60)),
-            },
-        },
-    });
+//     await prisma.auth.deleteMany({
+//         where: {
+//             createdAt: {
+//                 lte: new Date(Date.now() - (1000 * 60 * 60)),
+//             },
+//         },
+//     });
 
-    await prisma.userRequest.deleteMany({
-        where: {
-            createdAt: {
-                lte: new Date(Date.now() - (1000 * 60 * 60)),
-            },
-        },
-    });
-});
+//     await prisma.userRequest.deleteMany({
+//         where: {
+//             createdAt: {
+//                 lte: new Date(Date.now() - (1000 * 60 * 60)),
+//             },
+//         },
+//     });
+// });
 
 let data: VatsimData | null = null;
 
